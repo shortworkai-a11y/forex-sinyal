@@ -4,6 +4,11 @@ import pandas_ta as ta
 import pandas as pd
 from datetime import datetime
 import time
+import os
+os.system('pip install yfinance pandas-ta')
+
+import yfinance as yf
+import pandas_ta as ta
 
 # --- CONFIG DASHBOARD ---
 st.set_page_config(page_title="VANMORT v7.0 SOVEREIGN", layout="wide", initial_sidebar_state="collapsed")
