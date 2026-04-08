@@ -1,3 +1,28 @@
+import subprocess
+import sys
+
+# Fungsi untuk memaksa instalasi jika library hilang
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+try:
+    import yfinance as yf
+except ImportError:
+    install('yfinance')
+    import yfinance as yf
+
+try:
+    import pandas_ta as ta
+except ImportError:
+    install('pandas-ta')
+    import pandas_ta as ta
+
+import streamlit as st
+import pandas as pd
+from datetime import datetime
+import time
+
+# --- LANJUTKAN KODE SOVEREIGN V7.0 DISINI ---
 import streamlit as st
 import yfinance as yf
 import pandas_ta as ta
