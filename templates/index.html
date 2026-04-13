@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>PRO-QUANT PRE-DATOR v16</title>
+    <style>
+        body { background: #020202; color: #e0e0e0; font-family: 'Courier New', monospace; padding: 20px; }
+        .header { border-bottom: 2px solid #00ff9d; display: flex; justify-content: space-between; padding: 10px; margin-bottom: 20px; }
+        .grid-container { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        table { width: 100%; border-collapse: collapse; background: #0a0a0a; }
+        th { background: #111; color: #00d4ff; padding: 12px; text-align: left; border-bottom: 1px solid #333; }
+        td { padding: 10px; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+        .up { color: #00ff9d; font-weight: bold; }
+        .down { color: #ff3131; font-weight: bold; }
+        .sig-box { padding: 4px 8px; border-radius: 3px; font-weight: bold; }
+        .bsjp { background: #004d1a; color: #00ff9d; }
+        .bpjs { background: #002b4d; color: #00d4ff; }
+        .f-gold { color: #f1c40f; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="font-size: 24px; color: #00ff9d;">PRO-QUANT v16 | PREDATOR CORE</div>
+        <div id="status">INITIALIZING...</div>
+    </div>
+
+    <div class="grid-container" id="main-display">
+        </div>
+
+    <script>
+        async function refreshData() {
+            try {
+                const res = await fetch('/update');
+                const data = await res.json();
+                const container = document.getElementById('main-display');
+                container.innerHTML = ""; // Hapus tampilan lama (Anti-Double)
+
+                const segments = ["BIG", "MID", "SMALL"];
+                segments.forEach(seg => {
+                    let segData = data.filter(d => d.segment === seg);
+                    if(segData.length > 0) {
+                        let html = `<h3>${seg} CAP SEGMENT</h3><table><thead><tr>
+                            <th>TICKER</th><th>LAST</th><th>CHG%</th><th>VR</th><th>PE</th><th>PBV</th><th>ROE%</th><th>F_SCORE</th><th>SIGNAL</th>
+                            </tr></thead><tbody>`;
+                        
+                        segData.forEach(s => {
+                            html += `<tr>
+                                <td>${s.ticker}</td>
+                                <td>${s.last}</td>
+                                <td class="${s.chg >= 0 ? 'up' : 'down'}">${s.chg}%</td>
+                                <td>${s.vr}</td>
+                                <td>${s.pe}</td>
+                                <td>${s.pbv}</td>
+                                <td>${s.roe}%</td>
+                                <td class="${s.f_score >= 4 ? 'f-gold' : ''}">${s.f_score}/5</td>
+                                <td><span class="sig-box ${s.signal.includes('BSJP') ? 'bsjp' : s.signal.includes('BPJS') ? 'bpjs' : ''}">${s.signal}</span></td>
+                            </tr>`;
+                        });
+                        html += `</tbody></table>`;
+                        container.innerHTML += html;
+                    }
+                });
+                document.getElementById('status').innerText = "LIVE POLLING: " + new Date().toLocaleTimeString();
+            } catch (e) { console.error(e); }
+        }
+        setInterval(refreshData, 3000); // Update tiap 3 detik agar tidak membebani CPU server
+        refreshData();
+    </script>
+</body>
+</html>
